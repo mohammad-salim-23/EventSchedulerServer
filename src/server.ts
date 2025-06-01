@@ -1,25 +1,19 @@
-import express, { Request, Response } from "express";
-import cors from 'cors';
+import mongoose from "mongoose";
+import app from "./app";
+import config from "./app/config";
 
 
-const app = express();
-
-app.use(express.json());
-app.use(cors({
-  origin: [
-    "http://localhost:3000",
-  ],
-  credentials:true
-}));
-
-
-app.use('/api', router);
-
-app.get('/', (req: Request, res: Response) => {
-  res.send({ message: 'Alhamdulilah Server is running....' });
-});
+async function server() {
+  try {
+    await mongoose.connect(config.database_url as string);
+    console.log('Connected to mongodb database');
+    app.listen(config.port, () => {
+      console.log(`Server is running on ${config.port}`);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 
-app.use(globalErrorHandler)
-
-export default app;
+server();
