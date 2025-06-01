@@ -13,6 +13,14 @@ export const registerUser = async (req: Request, res: Response) => {
         .status(400)
         .json({ message: "Username, password, and shop names are required" });
     }
+     // Password validation
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters, contain at least one number, and one special character",
+      });
+    }
     if (shopNames.length < 3 || shopNames.length > 4) {
       return res
         .status(400)
@@ -32,7 +40,6 @@ export const registerUser = async (req: Request, res: Response) => {
     res.status(400).json({ message: error.message || "Registration failed" });
   }
 };
-
 // Controller: Login User
 export const loginUser = async (req: Request, res: Response) => {
   try {
@@ -47,7 +54,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const user = await UserServices.loginUserFromDB(username, password);
 
     const token = jwt.sign(
-      { userId: user._id, username: user.username },
+      { userId: user._id, username: user.username , shopNames:user.shopNames},
       process.env.JWT_SECRET || "defaultsecret",
       { expiresIn: "30m" }
     );

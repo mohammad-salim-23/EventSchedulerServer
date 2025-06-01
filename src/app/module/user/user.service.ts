@@ -5,7 +5,12 @@ import bcrypt from "bcrypt";
 // Register User
 const registerUserIntoDB = async (data: Partial<IUser>): Promise<IUser> => {
   const { username, password, shopNames } = data;
-
+ 
+   // Check if username already exists
+  const existingUser = await User.findOne({ username });
+  if (existingUser) {
+    throw new Error("Username already taken");
+  }
   // Check for unique shop names globally
   const existingShop = await User.findOne({ shopNames: { $in: shopNames } });
   if (existingShop) {

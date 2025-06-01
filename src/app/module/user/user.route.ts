@@ -7,3 +7,5 @@ const router = express.Router();
 
 router.post('/register', catchAsync(UserControllers.registerUser));
 router.post('/login', catchAsync(UserControllers.loginUser));
+
+export const UserRoutes = router;
