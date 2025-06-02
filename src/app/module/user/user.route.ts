@@ -7,5 +7,5 @@ const router = express.Router();
 
 router.post('/register', catchAsync(UserControllers.registerUser));
 router.post('/login', catchAsync(UserControllers.loginUser));
-
+router.post("/logout", catchAsync(UserControllers.logoutUser));
 export const UserRoutes = router;

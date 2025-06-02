@@ -43,7 +43,7 @@ export const registerUser = async (req: Request, res: Response) => {
 // Controller: Login User
 export const loginUser = async (req: Request, res: Response) => {
   try {
-    const { username, password } = req.body;
+    const { username, password , rememberMe } = req.body;
 
     if (!username || !password) {
       return res
@@ -52,13 +52,21 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 
     const user = await UserServices.loginUserFromDB(username, password);
-
+  const expiresIn = rememberMe? "7d": "30m";
+   const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : 30 * 60 * 1000; // 7 days or 30 mins
     const token = jwt.sign(
       { userId: user._id, username: user.username , shopNames:user.shopNames},
       process.env.JWT_SECRET || "defaultsecret",
-      { expiresIn: "30m" }
+     { expiresIn }
     );
-
+   res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // use true in prod with HTTPS
+      sameSite: "lax",
+      domain: ".localtest.me", // Important! set cookie domain for subdomains
+      maxAge,
+      path: "/",
+    });
     res.status(200).json({
       message: "Login successful",
       token,
@@ -67,8 +75,21 @@ export const loginUser = async (req: Request, res: Response) => {
     res.status(401).json({ message: error.message || "Login failed" });
   }
 };
+export const logoutUser = async(req: Request, res: Response) => {
+ 
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+     domain: ".localtest.me", 
+    path: "/", 
+  });
+
+  return res.status(200).json({ message: "Logout successful" });
+};
 export const UserControllers = {
   registerUser,
-  loginUser
+  loginUser,
+  logoutUser
 
 };
