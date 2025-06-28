@@ -65,8 +65,8 @@ const auth = (...requiredRoles: string[]) => {
   
       req.user = {
         userId: decode.id || decode.userId, 
-        email: decode.email,
-        username: decode.username,
+        email: decode?.userEmail,
+        username: decode?.username,
         role: decode.role,
       } as {
         userId: string;

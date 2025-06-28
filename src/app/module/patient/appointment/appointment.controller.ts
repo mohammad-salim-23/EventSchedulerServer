@@ -3,6 +3,7 @@ import catchAsync from "../../../utils/catchAsync";
 import mongoose from "mongoose";
 import { AppointmentService } from "./appointment.service";
 import { sendResponse } from "../../../utils/sendResponse";
+import { format, parseISO } from "date-fns"; // install: npm i date-fns
 
 const bookAppointment = catchAsync(async (req: Request, res: Response) => {
   if (!req.user) throw new Error("Unauthorized");
@@ -10,27 +11,32 @@ const bookAppointment = catchAsync(async (req: Request, res: Response) => {
   const userId = new mongoose.Types.ObjectId(req.user.userId);
   const {
     doctorId,
+    selectedDate,
+    timeSlot,
     doctorUsername,
     doctorEmail,
     serviceId,
     serviceTitle,
-    selectedDate,
-    timeSlot,
-    day,
   } = req.body;
+
+  // 🔸 Extract day from selectedDate
+  const day = format(parseISO(selectedDate), "EEEE"); // result: "Monday", "Tuesday", etc.
 
   const appointment = await AppointmentService.bookAppointment({
     doctorId: new mongoose.Types.ObjectId(doctorId),
     doctorUsername,
     doctorEmail,
-    serviceId: new mongoose.Types.ObjectId(serviceId),
-    serviceTitle,
+
     patientId: userId,
     patientUsername: req.user.username ?? (() => { throw new Error("Patient username missing"); })(),
     patientEmail: req.user.email ?? (() => { throw new Error("Patient email missing"); })(),
+
     selectedDate,
-    day,
+    day, // set day automatically
     timeSlot,
+
+    serviceId,
+    serviceTitle,
   });
 
   sendResponse(res, {
@@ -40,6 +46,8 @@ const bookAppointment = catchAsync(async (req: Request, res: Response) => {
     statusCode: 201,
   });
 });
+
+
 
 const getPatientAppointments = catchAsync(async (req: Request, res: Response) => {
   if (!req.user) throw new Error("Unauthorized");
