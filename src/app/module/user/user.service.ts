@@ -14,8 +14,19 @@ const registerUserIntoDB = async (data: Partial<IUser>): Promise<IUser> => {
   return await user.save();
 };
 
-const loginUserFromDB = async (username: string, password: string) => {
-  const user = await User.findOne({ username });
+const loginUserFromDB = async ({
+  username,
+  email,
+  password,
+}: {
+  username?: string;
+  email?: string;
+  password: string;
+}) => {
+  const user = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+
   if (!user) throw new Error("Invalid credentials");
 
   const isMatch = await bcrypt.compare(password, user.password);
