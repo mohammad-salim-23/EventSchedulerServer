@@ -3,38 +3,22 @@ import { IUser } from "./user.interface";
 
 const userSchema = new Schema<IUser>(
   {
-   
-   
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-    },
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: String, enum: ["doctor", "patient"], required: true },
+    email: { type: String, required: true, unique: true },
+    phone: { type: String, required: true },
 
-    
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-    },
+    // Doctor-specific fields
+    specialization: { type: String },
+    hospitalName: { type: String },
+    hospitalFloor: { type: String },
 
-   
-
-    shopNames: {
-      type: [String],
-      validate: [
-        {
-          validator: function (value: string[]) {
-            return value.length >= 3 && value.length <= 4;
-          },
-          message: "You must provide 3 or 4 shop names",
-        },
-      ],
-      required: [true, "Shop names are required"],
-    },
+    // Patient-specific fields
+    age: { type: Number },
+    gender: { type: String, enum: ["male", "female", "other"] },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 const User = model<IUser>("User", userSchema);
