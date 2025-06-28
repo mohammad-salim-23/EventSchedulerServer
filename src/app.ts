@@ -3,7 +3,7 @@ import cors from 'cors';
 import router from "./app/routers";
 import cookieParser from "cookie-parser";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
-
+import appointmentRoute from "./app/module/patient/appointment/appointment.route";
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
@@ -14,7 +14,8 @@ app.use(cors({
   credentials:true
 }));
 
-
+//mount appointments directly
+app.use("/api",appointmentRoute);
 app.use('/api', router);
 
 app.get('/', (req: Request, res: Response) => {

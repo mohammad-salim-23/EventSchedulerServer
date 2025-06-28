@@ -1,23 +1,35 @@
 import { Request, Response } from "express";
-import catchAsync from "../../utils/catchAsync";
+import catchAsync from "../../../utils/catchAsync";
 import mongoose from "mongoose";
 import { AppointmentService } from "./appointment.service";
-import { sendResponse } from "../../utils/sendResponse";
+import { sendResponse } from "../../../utils/sendResponse";
 
 const bookAppointment = catchAsync(async (req: Request, res: Response) => {
   if (!req.user) throw new Error("Unauthorized");
 
   const userId = new mongoose.Types.ObjectId(req.user.userId);
-  const { doctorId, selectedDate, timeSlot, doctorUsername, doctorEmail } = req.body;
+  const {
+    doctorId,
+    doctorUsername,
+    doctorEmail,
+    serviceId,
+    serviceTitle,
+    selectedDate,
+    timeSlot,
+    day,
+  } = req.body;
 
   const appointment = await AppointmentService.bookAppointment({
     doctorId: new mongoose.Types.ObjectId(doctorId),
     doctorUsername,
     doctorEmail,
+    serviceId: new mongoose.Types.ObjectId(serviceId),
+    serviceTitle,
     patientId: userId,
-    patientUsername: req.user.username ?? (() => { throw new Error("Patient username is missing"); })(),
-    patientEmail: req.user.email ?? (() => { throw new Error("Patient email is missing"); })(),
+    patientUsername: req.user.username ?? (() => { throw new Error("Patient username missing"); })(),
+    patientEmail: req.user.email ?? (() => { throw new Error("Patient email missing"); })(),
     selectedDate,
+    day,
     timeSlot,
   });
 

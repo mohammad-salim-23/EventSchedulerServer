@@ -6,6 +6,11 @@ const AppointmentSchema = new Schema<IAppointment>({
   doctorUsername: { type: String, required: true },
   doctorEmail: { type: String, required: true },
 
+  serviceId: { type: Schema.Types.ObjectId, required: true },
+  serviceTitle: { type: String, required: true },
+
+  day: { type: String, required: true },
+
   patientId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   patientUsername: { type: String, required: true },
   patientEmail: { type: String, required: true },

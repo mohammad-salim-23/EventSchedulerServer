@@ -24,9 +24,7 @@ const bookAppointment = async (appointmentData: IAppointment) => {
     appointmentData.timeSlot
   );
 
-  if (!available) {
-    throw new Error("Selected time slot is already booked.");
-  }
+  if (!available) throw new Error("Selected time slot is already booked.");
 
   const appointment = new AppointmentModel(appointmentData);
   return await appointment.save();
