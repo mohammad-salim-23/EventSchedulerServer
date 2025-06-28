@@ -1,45 +1,25 @@
-import User from "./user.model";
-import { IUser } from "./user.interface";
 import bcrypt from "bcrypt";
+import { IUser } from "./user.interface";
+import User from "./user.model";
 
-// Register User
+
 const registerUserIntoDB = async (data: Partial<IUser>): Promise<IUser> => {
-  const { username, password, shopNames } = data;
- 
-   // Check if username already exists
-  const existingUser = await User.findOne({ username });
-  if (existingUser) {
-    throw new Error("Username already taken");
-  }
-  // Check for unique shop names globally
-  const existingShop = await User.findOne({ shopNames: { $in: shopNames } });
-  if (existingShop) {
-    throw new Error("One or more shop names already taken");
-  }
+  const { username, email, phone, password } = data;
 
-  //Hash password
+  const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+  if (existingUser) throw new Error("Username or email already taken");
+
   const hashedPassword = await bcrypt.hash(password!, 10);
-
-  const user = new User({
-    username,
-    password: hashedPassword,
-    shopNames,
-  });
-
+  const user = new User({ ...data, password: hashedPassword });
   return await user.save();
 };
 
-//Login User
 const loginUserFromDB = async (username: string, password: string) => {
   const user = await User.findOne({ username });
-  if (!user) {
-    throw new Error("Invalid username or password");
-  }
+  if (!user) throw new Error("Invalid credentials");
 
-  const isPasswordMatch = await bcrypt.compare(password, user.password);
-  if (!isPasswordMatch) {
-    throw new Error("Incorrect password");
-  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw new Error("Invalid credentials");
 
   return user;
 };
