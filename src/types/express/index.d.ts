@@ -6,6 +6,7 @@ declare module "express" {
       userId: string;
       username?: string;
       role?: string;
+      email?:string;
     };
   }
 }
@@ -14,5 +15,6 @@ export interface AuthRequest extends Request {
     userId: string;
     username?: string;
     role?: string;
+    email?:string;
   };
 }
