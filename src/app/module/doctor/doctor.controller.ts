@@ -61,23 +61,11 @@ const setAvailability = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getAvailability = catchAsync(async (req: Request, res: Response) => {
-  if (!req.user?.userId) throw new Error("Unauthorized");
-  const userId = new mongoose.Types.ObjectId(req.user.userId);
-
-  const availability = await DoctorServices.getAvailability(userId);
-  sendResponse(res, {
-    success: true,
-    message: "Availability fetched successfully",
-    data: availability,
-    statusCode: 200,
-  });
-});
 
 export const DoctorController = {
   addService,
   editService,
   deleteService,
   setAvailability,
-  getAvailability,
+
 };

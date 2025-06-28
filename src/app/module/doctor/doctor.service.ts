@@ -90,18 +90,12 @@ const setAvailability = async (userId: Types.ObjectId, availability: IAvailabili
   return doctorDoc.availability;
 };
 
-// Get Availability
-const getAvailability = async (userId: Types.ObjectId) => {
-  const doctorDoc = await DoctorModel.findOne({ userId });
-  if (!doctorDoc) throw new Error("Doctor profile not found");
 
-  return doctorDoc.availability;
-};
 
 export const DoctorServices = {
   addService,
   editService,
   deleteService,
   setAvailability,
-  getAvailability,
+ 
 };

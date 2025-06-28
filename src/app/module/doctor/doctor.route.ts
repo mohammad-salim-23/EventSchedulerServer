@@ -13,6 +13,6 @@ router.delete("/services/:id",auth(USER_ROLE.DOCTOR), DoctorController.deleteSer
 
 // Availability
 router.post("/availability",auth(USER_ROLE.DOCTOR), DoctorController.setAvailability);
-router.get("/availability", DoctorController.getAvailability);
+
 
 export const DoctorRoutes = router;
