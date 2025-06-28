@@ -4,6 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import { DoctorServices } from "./doctor.service";
 import { sendResponse } from "../../utils/sendResponse";
 
+//add service
 const addService = catchAsync(async (req: Request, res: Response) => {
   if (!req.user?.userId) throw new Error("Unauthorized");
   const userId = new mongoose.Types.ObjectId(req.user.userId);
@@ -17,7 +18,7 @@ const addService = catchAsync(async (req: Request, res: Response) => {
     statusCode: 201,
   });
 });
-
+//edit service
 const editService = catchAsync(async (req: Request, res: Response) => {
   if (!req.user?.userId) throw new Error("Unauthorized");
   const userId = new mongoose.Types.ObjectId(req.user.userId);
@@ -32,7 +33,7 @@ const editService = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
   });
 });
-
+ //delete service
 const deleteService = catchAsync(async (req: Request, res: Response) => {
   if (!req.user?.userId) throw new Error("Unauthorized");
   const userId = new mongoose.Types.ObjectId(req.user.userId);
