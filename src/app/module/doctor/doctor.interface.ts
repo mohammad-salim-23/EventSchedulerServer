@@ -1,22 +1,28 @@
-
 import { Types } from "mongoose";
 
 export interface IService {
   _id?: string | Types.ObjectId;
   title: string;
-  description: string;
+  description?: string;
   price: number;
-  duration: number; // in minutes
+  duration: number;
+  doctorId: Types.ObjectId;
+  doctorUsername: string;
+  doctorEmail: string;
 }
 
 export interface IAvailabilitySlot {
-  day: string; // e.g. "Monday"
-  slots: { start: string; end: string }[]; // time slots in HH:mm or "10:00 AM"
+  _id?: string | Types.ObjectId;
+  day: string;
+  slots: { start: string; end: string }[];
+  doctorId: Types.ObjectId;
+  doctorUsername: string;
+  doctorEmail: string;
 }
 
 export interface IDoctor {
   _id?: string | Types.ObjectId;
-  userId: Types.ObjectId; // reference to User
+  userId: Types.ObjectId; // reference to User document
   services: IService[];
   availability: IAvailabilitySlot[];
 }

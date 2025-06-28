@@ -1,68 +1,101 @@
-
-import { Types } from "mongoose";
-import { IAvailabilitySlot, IService } from "./doctor.interface";
+import mongoose, { Types } from "mongoose";
 import DoctorModel from "./doctor.model";
+import User from "../user/user.model";
+import { IService, IAvailabilitySlot } from "./doctor.interface";
 
-
-// Add service
-const addService = async (userId: Types.ObjectId, service: IService) => {
-  const doctor = await DoctorModel.findOne({ userId });
-  if (!doctor) throw new Error("Doctor profile not found");
-
-  doctor.services.push(service);
-  await doctor.save();
-  return doctor.services;
+// Helper to get doctor info from User model
+const getDoctorInfo = async (userId: Types.ObjectId) => {
+  const doctor = await User.findOne({ _id: userId, role: "doctor" });
+  if (!doctor) throw new Error("Doctor not found");
+  return {
+    doctorId: doctor._id,
+    doctorUsername: doctor.username,
+    doctorEmail: doctor.email,
+  };
 };
 
-// Edit service
+// Add Service
+const addService = async (userId: Types.ObjectId, serviceData: Omit<IService, "doctorId" | "doctorUsername" | "doctorEmail">) => {
+  const doctorInfo = await getDoctorInfo(userId);
+
+  // Find existing doctor doc or create new
+  let doctorDoc = await DoctorModel.findOne({ userId: doctorInfo.doctorId });
+  if (!doctorDoc) {
+    doctorDoc = new DoctorModel({ userId: doctorInfo.doctorId, services: [], availability: [] });
+  }
+
+  const newService = {
+    ...serviceData,
+    doctorId: new mongoose.Types.ObjectId(doctorInfo.doctorId),
+    doctorUsername: doctorInfo.doctorUsername,
+    doctorEmail: doctorInfo.doctorEmail,
+  };
+
+  doctorDoc.services.push(newService);
+  await doctorDoc.save();
+  return doctorDoc.services;
+};
+
+// Edit Service
 const editService = async (
   userId: Types.ObjectId,
   serviceId: string,
   updatedService: Partial<IService>
 ) => {
-  const doctor = await DoctorModel.findOne({ userId });
-  if (!doctor) throw new Error("Doctor profile not found");
+  const doctorDoc = await DoctorModel.findOne({ userId });
+  if (!doctorDoc) throw new Error("Doctor profile not found");
 
-  const service = doctor.services.find((s: any) => s._id?.toString() === serviceId);
+  const service = doctorDoc.services.find((s: any) => s._id?.toString() === serviceId);
   if (!service) throw new Error("Service not found");
 
   Object.assign(service, updatedService);
-  await doctor.save();
+  await doctorDoc.save();
+
   return service;
 };
 
-// Delete service
+// Delete Service
 const deleteService = async (userId: Types.ObjectId, serviceId: string) => {
-  const doctor = await DoctorModel.findOne({ userId });
-  if (!doctor) throw new Error("Doctor profile not found");
+  const doctorDoc = await DoctorModel.findOne({ userId });
+  if (!doctorDoc) throw new Error("Doctor profile not found");
 
-  const serviceIndex = doctor.services.findIndex((s: any) => s._id?.toString() === serviceId);
+  const serviceIndex = doctorDoc.services.findIndex((s: any) => s._id?.toString() === serviceId);
   if (serviceIndex === -1) throw new Error("Service not found");
 
-  doctor.services.splice(serviceIndex, 1);
-  await doctor.save();
+  doctorDoc.services.splice(serviceIndex, 1);
+  await doctorDoc.save();
+
   return true;
 };
 
-// Set availability (replace all)
-const setAvailability = async (
-  userId: Types.ObjectId,
-  availability: IAvailabilitySlot[]
-) => {
-  const doctor = await DoctorModel.findOne({ userId });
-  if (!doctor) throw new Error("Doctor profile not found");
+// Set Availability (replace all)
+const setAvailability = async (userId: Types.ObjectId, availability: IAvailabilitySlot[]) => {
+  const doctorInfo = await getDoctorInfo(userId);
 
-  doctor.availability = availability;
-  await doctor.save();
-  return doctor.availability;
+  let doctorDoc = await DoctorModel.findOne({ userId: doctorInfo.doctorId });
+  if (!doctorDoc) {
+    doctorDoc = new DoctorModel({ userId: doctorInfo.doctorId, services: [], availability: [] });
+  }
+
+  const availabilityWithDoctorInfo = availability.map(slot => ({
+    ...slot,
+    doctorId: new mongoose.Types.ObjectId(doctorInfo.doctorId),
+    doctorUsername: doctorInfo.doctorUsername,
+    doctorEmail: doctorInfo.doctorEmail,
+  }));
+
+  doctorDoc.availability = availabilityWithDoctorInfo;
+  await doctorDoc.save();
+
+  return doctorDoc.availability;
 };
 
-// Get availability
+// Get Availability
 const getAvailability = async (userId: Types.ObjectId) => {
-  const doctor = await DoctorModel.findOne({ userId });
-  if (!doctor) throw new Error("Doctor profile not found");
+  const doctorDoc = await DoctorModel.findOne({ userId });
+  if (!doctorDoc) throw new Error("Doctor profile not found");
 
-  return doctor.availability;
+  return doctorDoc.availability;
 };
 
 export const DoctorServices = {

@@ -58,7 +58,7 @@ const auth = (...requiredRoles: string[]) => {
         throw new AppError(401, "You are not authorized.It is not your role.");
       }
   
-      const user = await User.findOne({ _id: decode.id });
+      const user = await User.findOne({ _id: decode.userId });
       if (!user) {
         throw new AppError(401, "User is not found!");
       }
