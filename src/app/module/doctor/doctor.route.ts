@@ -15,4 +15,7 @@ router.delete("/services/:id",auth(USER_ROLE.DOCTOR), DoctorController.deleteSer
 router.post("/availability",auth(USER_ROLE.DOCTOR), DoctorController.setAvailability);
 
 
+// Doctor-side appointment management
+router.get("/appointments", auth(USER_ROLE.DOCTOR), DoctorController.getDoctorAppointments);
+router.patch("/appointments/:id/status", auth(USER_ROLE.DOCTOR), DoctorController.updateAppointmentStatus);
 export const DoctorRoutes = router;
