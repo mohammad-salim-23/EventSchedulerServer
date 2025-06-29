@@ -1,67 +1,71 @@
 Dr.Tech Server
-
-This is the backend server for the Dr.Tech medical appointment management system.
+This is the backend server for the Dr.Tech medical appointment management system. It handles authentication, doctor availability, patient bookings, and appointment workflows.
 
 ✨ Tech Stack
-
 Node.js
 
 Express.js
 
 TypeScript
 
-MongoDB with Mongoose
+MongoDB + Mongoose
 
-Zod for validation
+Zod (for request validation)
 
-JWT for authentication
+JWT (for secure authentication)
 
-bcryptjs for password hashing
+bcryptjs (for password hashing)
 
 ⚙️ Setup Instructions
-
-1. Clone the repository
-
-https://github.com/mohammad-salim-23/Dr.TechtaskServer
+1. Clone the Repository
+bash
+Copy
+Edit
+git clone https://github.com/mohammad-salim-23/Dr.TechtaskServer
 cd Dr.TechtaskServer
 
-2. Install dependencies
+2. Install Dependencies
 
 npm install
 
 3. Environment Variables
+Create a .env file in the project root with the following content:
 
-Create a .env file in the root with the following:
+env
 
 NODE_ENV=development
 PORT=5000
 DATABASE_URL=your_mongodb_connection_string
 JWT_SECRET=your_secure_secret
 
-4. Run the server
-
+4. Run the Server
 Development Mode:
-
 npm run start:dev
 
 Production Build:
-
 npm run build
 npm run start:prod
+The server will run at: http://localhost:5000
 
-Server will be running at: http://localhost:5000
-
-💡 Default Admin User
-
+👤 Default Admin User
 Username: Dr.Tech
+
 Password: salim123
 
-Note: You must add this admin manually in your database if it doesn't exist.
+⚠️ You must manually insert this admin user into the users collection if not created already.
+
+🔐 Authentication Notes
+You must login to access any protected route (doctor, patient, or admin).
+
+Once logged in, a JWT token is returned. This must be passed in the Authorization header in Postman or any client like so:
+
+makefile
+
+Authorization: Bearer <your_token_here>
+Only one active login per user is allowed. If a user is already logged in, they must log out before logging in again (use /api/auth/logout).
 
 🚀 API Endpoints
-
-✉️ Auth
-
+✉️ Auth Routes
 POST /api/auth/register-doctor
 
 POST /api/auth/register-patient
@@ -70,46 +74,46 @@ POST /api/auth/login
 
 POST /api/auth/logout
 
-🏥 Public Doctor View (Patient Side)
+🏥 Doctor (Public View)
+GET /api/doctors — Browse doctors (with filters by hospital, specialization, service)
 
-GET /api/doctors - Browse doctors with filters (hospital, specialization, service)
+GET /api/doctors/:id — View individual doctor profile with services and availability
 
-GET /api/doctors/:id - View a doctor's full profile
+👨‍⚕️ Doctor Panel (Protected - Requires Doctor Login)
+POST /api/doctor/services — Add new service
 
-💼 Doctor Panel
+PATCH /api/doctor/services/:id — Edit existing service
 
-POST /api/doctor/services
+DELETE /api/doctor/services/:id — Delete service
 
-PATCH /api/doctor/services/:id
+POST /api/doctor/availability — Set availability
 
-DELETE /api/doctor/services/:id
+GET /api/doctor/appointments — View appointment requests (optionally filter by status)
 
-POST /api/doctor/availability
+PATCH /api/doctor/appointments/:id/status?status=accepted|cancelled — Update appointment status
 
-GET /api/doctor/appointments
+👩‍⚕️ Patient Panel (Protected - Requires Patient Login)
+POST /api/appointments — Book an appointment
 
-PATCH /api/doctor/appointments/:id/status
+GET /api/patient/appointments — View patient's own appointments
 
-🎓 Patient Panel
+🧑‍💼 Admin Panel (Protected - Requires Admin Login)
+GET /api/admin/allcollections — View total doctors, patients, and appointments
 
-POST /api/appointments - Book an appointment
+📃 Pagination (Bonus)
+GET /api/auth/pagination?page=1&limit=10 — Paginate doctor appointments
 
-GET /api/patient/appointments - View booked appointments
-
-📈 Admin Dashboard
-
-GET /api/admin/allcollections - Get total counts of doctors, patients, and appointments
-
-📃 Pagination (Bonus Feature)
-
-GET /api/auth/pagination?page=1&limit=10 - Paginated doctor appointments
-
-🚫 Error Handling
-
-Global error handler is available and integrated into the middleware. All errors are formatted with:
+🚫 Error Handling Format
+All errors are globally handled and returned in this format:
 
 
+{
+  "success": false,
+  "message": "Error message",
+  "errorDetails": "Stack trace if in development mode"
+}
 
+// Example global error handler
 const globalErrorHandler = (
   err: any,
   req: Request,
@@ -127,16 +131,21 @@ const globalErrorHandler = (
 };
 
 export default globalErrorHandler;
+🌐 Deployment
+This project is deployable on any Node.js environment.
 
-#deploy_link: https://dr-tech-server.vercel.app
+Example placeholder link (replace when deployed):
+
+https://dr-tech-server.vercel.app
+
 🚧 Future Improvements
+🔔 Email notifications (on appointment request and acceptance)
 
-Email notifications on appointment request/accept (currently planned but not implemented)
+📊 Admin dashboard UI
 
-Admin panel UI
+📆 Enhanced time slot conflict validation
 
-🎉 That's it!
-
-You can now start using Dr.Tech server locally. For any setup issues or improvements, feel free to reach out.
-
-Author: [Mohammad Salim]
+👨‍💻 Author
+Mohammad Salim
+mohammadsalim017427@gmail.com
+If you face any issues setting up or using the API, feel free to open an issue or reach out.
