@@ -82,14 +82,14 @@ const getDoctorAppointments = catchAsync(async (req: Request, res: Response) => 
   });
 });
 
-// Update appointment status (accept, cancel, complete)
+// Update appointment status (pending, confirmed, cancelled)
 const updateAppointmentStatus = catchAsync(async (req: Request, res: Response) => {
   if (!req.user) throw new Error("Unauthorized");
   const doctorId = new mongoose.Types.ObjectId(req.user.userId);
   const appointmentId = req.params.id;
   const { status } = req.body;
 
-  const validStatuses = ["accepted", "cancelled", "completed"];
+  const validStatuses = ["pending", "confirmed", "cancelled","completed"];
   if (!validStatuses.includes(status)) {
     throw new Error("Invalid status");
   }
