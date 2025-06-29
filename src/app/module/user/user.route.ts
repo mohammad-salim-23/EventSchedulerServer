@@ -9,5 +9,5 @@ router.post('/register-doctor', catchAsync(UserControllers.registerDoctor));
 router.post('/register-patient', catchAsync(UserControllers.registerPatient));
 router.post('/login',  catchAsync(UserControllers.loginUser));
 router.post('/logout', catchAsync(UserControllers.logoutUser));
-
+router.get("/pagination",UserControllers.getPaginatedDoctorAppointments);
 export const UserRoutes = router;

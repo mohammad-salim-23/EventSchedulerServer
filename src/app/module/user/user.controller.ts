@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { UserServices } from "./user.service";
+import catchAsync from "../../utils/catchAsync";
+import AppointmentModel from "../patient/appointment/appointment.model";
+import { sendResponse } from "../../utils/sendResponse";
 
 export const registerDoctor = async (req: Request, res: Response) => {
   try {
@@ -84,10 +87,37 @@ export const logoutUser = async (req: Request, res: Response) => {
   res.clearCookie("accessToken");
   res.status(200).json({ message: "Logout successful" });
 };
+//  Paginated Appointments for Doctor
+const getPaginatedDoctorAppointments = catchAsync(async (req: Request, res: Response) => {
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (Number(page) - 1) * Number(limit);
+  const doctorId = req.user?.userId;
 
+  const [appointments, total] = await Promise.all([
+    AppointmentModel.find({ doctorId })
+      .skip(skip)
+      .limit(Number(limit)),
+    AppointmentModel.countDocuments({ doctorId })
+  ]);
+
+  sendResponse(res, {
+    success: true,
+    message: 'Paginated appointments fetched',
+    data: {
+      meta: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+      },
+      appointments,
+    },
+    statusCode: 200
+  });
+});
 export const UserControllers = {
   registerDoctor,
   registerPatient,
   loginUser,
   logoutUser,
+  getPaginatedDoctorAppointments
 };

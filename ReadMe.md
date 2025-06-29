@@ -1,98 +1,142 @@
-9am Job Task Server
+Dr.Tech Server
 
-This is a simple **Express.js** server built with **TypeScript** and **Mongoose** for basic user authentication, including:
+This is the backend server for the Dr.Tech medical appointment management system.
 
-✅ User **signup**  
-✅ User **signin**  
+✨ Tech Stack
 
----
+Node.js
 
-## 📚 Documentation
+Express.js
 
-This server-side project includes:
+TypeScript
 
-- **Express.js** for routing and middleware.
-- **Mongoose** for MongoDB data modeling.
-- **TypeScript** for strong typing and maintainability.
-- **Only two basic user routes**: `/signup` and `/signin`.
+MongoDB with Mongoose
 
----
+Zod for validation
 
-## 🚀 Getting Started
+JWT for authentication
 
-### 1️⃣ Clone the repository
-```bash
-git clone https://github.com/mohammad-salim-23/9amjobtaskserver.git
-cd 9amjobtaskserver
-2️⃣ Install dependencies
-bash
-Copy
-Edit
+bcryptjs for password hashing
+
+⚙️ Setup Instructions
+
+1. Clone the repository
+
+https://github.com/mohammad-salim-23/Dr.TechtaskServer
+cd Dr.TechtaskServer
+
+2. Install dependencies
+
 npm install
-3️⃣ Setup environment variables
-Create a .env file in the root directory:
 
-ini
-Copy
-Edit
+3. Environment Variables
+
+Create a .env file in the root with the following:
+
+NODE_ENV=development
 PORT=5000
-MONGO_URI=<your-mongodb-connection-string>
-JWT_SECRET=<your-secret-key>
-4️⃣ Build TypeScript
-bash
-Copy
-Edit
+DATABASE_URL=your_mongodb_connection_string
+JWT_SECRET=your_secure_secret
+
+4. Run the server
+
+Development Mode:
+
+npm run start:dev
+
+Production Build:
+
 npm run build
-5️⃣ Start the server
-For production:
-npm run start
-For development (with live reload):
+npm run start:prod
 
-npm run dev
-📂 API Endpoints
-Method	Endpoint	Description
-POST	/auth/register	Register a new user
-POST	/auth/login	Authenticate a user
+Server will be running at: http://localhost:5000
 
-💡 Example Requests
-Signup
+💡 Default Admin User
 
-POST /auth/register
-Content-Type: application/json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "securepassword"
-}
-login
+Username: Dr.Tech
+Password: salim123
 
-POST /auth/login
-Content-Type: application/json
-{
-  "email": "john@example.com",
-  "password": "securepassword"
-}
-🌐 Local Testing
-Once you’ve started the server (npm run dev), visit:
-http://localhost:5000/
-Use tools like Postman or curl to test the signup/signin routes.
+Note: You must add this admin manually in your database if it doesn't exist.
 
-📦 Scripts
-Script	Command	Description
-start	node dist/index.js	Runs the compiled JS code.
-dev	nodemon src/index.ts	Development mode with live reload.
-build	tsc	Compiles TypeScript to JavaScript.
+🚀 API Endpoints
 
-🤝 Contributing
-Feel free to fork this repo and create a pull request if you’d like to contribute!
+✉️ Auth
 
-📝 License
-MIT
+POST /api/auth/register-doctor
 
-📌 Notes
-✅ Replace <your-mongodb-connection-string> and <your-secret-key> with your actual credentials in .env.
-✅ You can explore the source code and update routes or models as needed!
+POST /api/auth/register-patient
 
-GitHub Repository:
-https://github.com/mohammad-salim-23/9amjobtaskserver
+POST /api/auth/login
 
+POST /api/auth/logout
+
+🏥 Public Doctor View (Patient Side)
+
+GET /api/doctors - Browse doctors with filters (hospital, specialization, service)
+
+GET /api/doctors/:id - View a doctor's full profile
+
+💼 Doctor Panel
+
+POST /api/doctor/services
+
+PATCH /api/doctor/services/:id
+
+DELETE /api/doctor/services/:id
+
+POST /api/doctor/availability
+
+GET /api/doctor/appointments
+
+PATCH /api/doctor/appointments/:id/status
+
+🎓 Patient Panel
+
+POST /api/appointments - Book an appointment
+
+GET /api/patient/appointments - View booked appointments
+
+📈 Admin Dashboard
+
+GET /api/admin/allcollections - Get total counts of doctors, patients, and appointments
+
+📃 Pagination (Bonus Feature)
+
+GET /api/auth/pagination?page=1&limit=10 - Paginated doctor appointments
+
+🚫 Error Handling
+
+Global error handler is available and integrated into the middleware. All errors are formatted with:
+
+
+
+const globalErrorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+
+  res.status(statusCode).json({
+    success: false,
+    message,
+    errorDetails: process.env.NODE_ENV === "development" ? err.stack : undefined,
+  });
+};
+
+export default globalErrorHandler;
+
+#deploy_link: https://dr-tech-server.vercel.app
+🚧 Future Improvements
+
+Email notifications on appointment request/accept (currently planned but not implemented)
+
+Admin panel UI
+
+🎉 That's it!
+
+You can now start using Dr.Tech server locally. For any setup issues or improvements, feel free to reach out.
+
+Author: [Mohammad Salim]
