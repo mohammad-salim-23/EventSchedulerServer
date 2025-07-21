@@ -3,8 +3,8 @@ import Event from "./event.model";
 
 
 // Keywords
-const workKeywords = ["meeting", "project", "client"];
-const personalKeywords = ["birthday", "family"];
+const workKeywords = ["meeting", "project", "client", "deadline", "presentation", "report"];
+const personalKeywords = ["birthday", "family", "anniversary", "vacation", "holiday", "party"];
 
 const createEvent = async (
   data: Omit<IEvent, "_id" | "category" | "archived"> & { notes?: string }
