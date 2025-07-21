@@ -8,4 +8,5 @@ export interface IEvent {
   notes?: string;
   archived: boolean;
   category: "Work" | "Personal" | "Other";
+  createdBy: Types.ObjectId; 
 }

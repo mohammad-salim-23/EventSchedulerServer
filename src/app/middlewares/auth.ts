@@ -36,49 +36,43 @@ import AppError from "../errors/AppError";
 //     })
 // }
 
-
 const auth = (...requiredRoles: string[]) => {
-    return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-      const token = req.headers.authorization;
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new AppError(401, "You are not authorized. Token missing or malformed.");
+    }
 
-      if (!token) {
-        throw new AppError(401, "You are not authorized.");
-      }
-  
-      let decode;
-      try {
-        decode = jwt.verify(token, config.jwt_secret as string) as JwtPayload;
-      } catch (err) {
-        throw new AppError(401, "You are not authorized.Update your token.");
-      }
-  
-      const role = decode.role;
-  
-      if (!requiredRoles.includes(role)) {
-        throw new AppError(401, "You are not authorized.It is not your role.");
-      }
-  
-      const user = await User.findOne({ _id: decode.userId });
-      if (!user) {
-        throw new AppError(401, "User is not found!");
-      }
-  
-      req.user = {
-        userId: decode.id || decode.userId, 
-        email: decode?.userEmail,
-        username: decode?.username,
-        role: decode.role,
-      } as {
-        userId: string;
-        email?: string;
-        username?: string;
-        role?: string;
-      };
-      next();
-    });
-  };
-  
-  
-  
+    const token = authHeader.split(" ")[1]; // extract token part only
+
+    let decode;
+    try {
+      decode = jwt.verify(token, config.jwt_secret as string) as JwtPayload;
+    } catch (err) {
+      throw new AppError(401, "Invalid token. Please login again.");
+    }
+
+    const role = decode.role;
+
+    if (!requiredRoles.includes(role)) {
+      throw new AppError(403, "Forbidden: Insufficient role permission.");
+    }
+
+    const user = await User.findById(decode.userId);
+    if (!user) {
+      throw new AppError(401, "User not found.");
+    }
+
+    req.user = {
+      userId: decode.userId,
+      email: decode.email,
+      username: decode.username,
+      role: decode.role,
+    };
+
+    next();
+  });
+};
+
 
 export default auth;

@@ -1,13 +1,13 @@
 import { IEvent } from "./event.interface";
 import Event from "./event.model";
+import { Types } from "mongoose";
 
-
-// Keywords
 const workKeywords = ["meeting", "project", "client", "deadline", "presentation", "report"];
 const personalKeywords = ["birthday", "family", "anniversary", "vacation", "holiday", "party"];
 
 const createEvent = async (
-  data: Omit<IEvent, "_id" | "category" | "archived"> & { notes?: string }
+  data: Omit<IEvent, "_id" | "category" | "archived" | "createdBy"> & { notes?: string },
+  userId: Types.ObjectId
 ): Promise<IEvent> => {
   const { title, notes } = data;
   const titleLower = title.toLowerCase();
@@ -25,26 +25,38 @@ const createEvent = async (
     ...data,
     archived: false,
     category,
+    createdBy: userId,
   });
 
   return newEvent;
 };
 
- const getAllEvents = async (): Promise<IEvent[]> => {
+const getAllEvents = async (): Promise<IEvent[]> => {
   return Event.find().sort({ date: 1, time: 1 });
 };
 
- const updateEventArchivedStatus = async (_id: string): Promise<IEvent | null> => {
-  const updatedEvent = await Event.findByIdAndUpdate(
-    _id,
+const getUserEvents = async (userId: string): Promise<IEvent[]> => {
+  return Event.find({ createdBy: userId }).sort({ date: 1, time: 1 });
+};
+
+const updateEventArchivedStatus = async (_id: string, userId: string): Promise<IEvent | null> => {
+  const updatedEvent = await Event.findOneAndUpdate(
+    { _id, createdBy: userId },
     { archived: true },
     { new: true }
   );
   return updatedEvent;
 };
 
-const deleteEvent = async (_id: string): Promise<boolean> => {
-  const deletedEvent = await Event.findByIdAndDelete(_id);
+const deleteEvent = async (_id: string, userId: string): Promise<boolean> => {
+  const deletedEvent = await Event.findOneAndDelete({ _id, createdBy: userId });
   return !!deletedEvent;
 };
-export const EventServices = {createEvent,getAllEvents,updateEventArchivedStatus,deleteEvent }
+
+export const EventServices = {
+  createEvent,
+  getAllEvents,
+  getUserEvents,
+  updateEventArchivedStatus,
+  deleteEvent,
+};
