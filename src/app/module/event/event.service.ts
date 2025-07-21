@@ -40,12 +40,11 @@ const getUserEvents = async (userId: string): Promise<IEvent[]> => {
 };
 
 const updateEventArchivedStatus = async (_id: string, userId: string): Promise<IEvent | null> => {
-  const updatedEvent = await Event.findOneAndUpdate(
-    { _id, createdBy: userId },
-    { archived: true },
-    { new: true }
-  );
-  return updatedEvent;
+  const event = await Event.findOne({_id,createdBy:userId});
+  if(!event) return null;
+  event.archived = !event.archived;
+  await event.save();
+  return event;
 };
 
 const deleteEvent = async (_id: string, userId: string): Promise<boolean> => {
