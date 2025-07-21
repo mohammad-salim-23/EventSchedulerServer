@@ -1,7 +1,5 @@
 export const USER_ROLE = {
-    PATIENT: "patient",
-    DOCTOR: "doctor",
-    ADMIN: "admin",
+    USER:"user"
 } as const;
 
 export type TUserRole = keyof typeof USER_ROLE;

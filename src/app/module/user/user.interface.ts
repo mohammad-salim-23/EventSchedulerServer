@@ -1,23 +1,9 @@
-import { Types } from "mongoose";
-
-export type UserRole = "doctor" | "patient";
-
 export interface IUser {
-  _id?: string | Types.ObjectId;
+  _id?: string;
   username: string;
-  password: string;
-  role: UserRole;
   email: string;
-  phone: string;
+  password: string;
+  role?: string; 
   createdAt?: Date;
   updatedAt?: Date;
-
-  // Doctor-specific
-  specialization?: string;
-  hospitalName?: string;
-  hospitalFloor?: string;
-
-  // Patient-specific
-  age?: number;
-  gender?: "male" | "female" | "other";
 }
