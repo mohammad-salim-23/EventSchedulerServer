@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { UserRoutes } from "../module/user/user.route";
-import { DoctorRoutes } from "../module/doctor/doctor.route";
-import { PublicDOctorRoutes } from "../module/patient/viewDoctorProfile/viewDoctorProfile.route";
-import { AdminRoutes } from "../module/Admin/Admin.route";
+import { eventRoutes } from "../module/event/event.route";
+
+
 const router = Router();
 
 const moduleROuters = [
@@ -13,17 +13,10 @@ const moduleROuters = [
     
     },
     {
-        path:"/doctor",
-        route:DoctorRoutes
-    },
-    {
-        path:"/doctors",
-        route:PublicDOctorRoutes
-    },
-    {
-        path:"/admin",
-        route:AdminRoutes
+        path:"/events",
+        route:eventRoutes
     }
+    
 ]
 moduleROuters.forEach((route) => router.use(route.path, route.route));
 export default router;
