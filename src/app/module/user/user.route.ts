@@ -1,13 +1,33 @@
-import express from 'express';
-import { UserControllers } from './user.controller';
-import catchAsync from '../../utils/catchAsync';
-import { checkAlreadyLoggedIn } from '../../utils/checkAlreadyLoggedIn';
+import express from "express";
 
+import { z } from "zod";
+import catchAsync from "../../utils/catchAsync";
+import { UserControllers } from "./user.controller";
+import { validateRequest } from "../../utils/validateRequest";
 
 const router = express.Router();
-router.post('/register-doctor', catchAsync(UserControllers.registerDoctor));
-router.post('/register-patient', catchAsync(UserControllers.registerPatient));
-router.post('/login',  catchAsync(UserControllers.loginUser));
-router.post('/logout', catchAsync(UserControllers.logoutUser));
-router.get("/pagination",UserControllers.getPaginatedDoctorAppointments);
+const registerSchema = z.object({
+  body: z.object({
+    username: z.string(),
+    email: z.string().email(),
+    password: z.string().min(6),
+  }),
+});
+const loginSchema = z.object({
+  body: z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+  }),
+});
+
+router.post(
+  "/register",
+  validateRequest(registerSchema),
+  catchAsync(UserControllers.registerUser)
+);
+router.post(
+  "/login",
+  validateRequest(loginSchema),
+  catchAsync(UserControllers.loginUser)
+);
 export const UserRoutes = router;

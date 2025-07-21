@@ -3,7 +3,7 @@ import User from "./user.model";
 import config from "../../config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-export const registerUser = async (req: Request, res: Response) => {
+ const registerUser = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = new User({ username, email, password: hashedPassword });
@@ -11,7 +11,7 @@ export const registerUser = async (req: Request, res: Response) => {
   res.status(201).json({ message: "User registered", data: user });
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+ const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   //Find user by email
@@ -57,3 +57,4 @@ export const loginUser = async (req: Request, res: Response) => {
     },
   });
 };
+export const UserControllers = {registerUser,loginUser};
