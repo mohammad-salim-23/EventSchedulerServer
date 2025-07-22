@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/", auth(USER_ROLE.USER), validateEventInput, createEvent);
 router.get("/", getAllEvents);
 router.get("/my-events", auth(USER_ROLE.USER), getUserEvents); 
-router.put("/:id", auth(USER_ROLE.USER), archiveEvent);
-router.delete("/:id", auth(USER_ROLE.USER), deleteEvent);
+router.patch("/:id", auth(USER_ROLE.USER), archiveEvent);
+router.delete("/:id", auth("user"), deleteEvent);
 
 export const eventRoutes = router;

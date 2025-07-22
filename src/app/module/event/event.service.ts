@@ -39,11 +39,22 @@ const getUserEvents = async (userId: string): Promise<IEvent[]> => {
   return Event.find({ createdBy: userId }).sort({ date: 1, time: 1 });
 };
 
-const updateEventArchivedStatus = async (_id: string, userId: string): Promise<IEvent | null> => {
-  const event = await Event.findOne({_id,createdBy:userId});
-  if(!event) return null;
+export const updateEventArchivedStatus = async (_id: string, userId: string): Promise<IEvent | null> => {
+  // 🔒 Validate IDs before querying
+  if (!Types.ObjectId.isValid(_id)) throw new Error("Invalid event ID");
+  if (!Types.ObjectId.isValid(userId)) throw new Error("Invalid user ID");
+
+  const event = await Event.findOne({
+    _id: new Types.ObjectId(_id),
+    createdBy: new Types.ObjectId(userId),
+  });
+
+  if (!event) return null;
+
+  //Toggle archived status
   event.archived = !event.archived;
   await event.save();
+
   return event;
 };
 

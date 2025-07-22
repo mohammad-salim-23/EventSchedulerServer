@@ -16,6 +16,22 @@ export const createEvent = async (req: Request, res: Response) => {
       });
     }
 
+    const { date, time } = req.body;
+
+    // Combine date and time into one Date object
+    const eventDateTime = new Date(`${date}T${time}`);
+    const currentDateTime = new Date();
+
+    // Check if eventDateTime is in the past
+    if (eventDateTime < currentDateTime) {
+      return sendResponse(res, {
+        statusCode: 400,
+        success: false,
+        message: "Invalid: Event date and time cannot be in the past.",
+        data: null,
+      });
+    }
+
     const newEvent = await EventServices.createEvent(req.body, new Types.ObjectId(userId));
     sendResponse(res, {
       statusCode: 201,
@@ -83,8 +99,11 @@ export const getUserEvents = async (req: Request, res: Response) => {
 
 export const archiveEvent = async (req: Request, res: Response) => {
   try {
+ 
     const { id } = req.params;
+    console.log("test..",req.user);
     const userId = req.user?.userId;
+
     if (!userId) {
       return sendResponse(res, {
         statusCode: 401,
@@ -94,10 +113,8 @@ export const archiveEvent = async (req: Request, res: Response) => {
       });
     }
 
-    const updatedEvent = await EventServices.updateEventArchivedStatus(
-      id,
-      new Types.ObjectId(userId).toString()
-    );
+    //Pass raw userId string here
+    const updatedEvent = await EventServices.updateEventArchivedStatus(id, userId);
 
     if (!updatedEvent) {
       return sendResponse(res, {
@@ -111,7 +128,7 @@ export const archiveEvent = async (req: Request, res: Response) => {
     sendResponse(res, {
       statusCode: 200,
       success: true,
-      message: "Event archived successfully",
+      message: "Event archived status updated successfully",
       data: updatedEvent,
     });
   } catch (error: any) {
